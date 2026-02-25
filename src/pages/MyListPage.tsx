@@ -19,20 +19,21 @@ export default function MyListPage() {
   // Show empty list text
   if (items.length === 0) {
     return (
-      <main className="p-6 text-center text-gray-400 mt-20">
-        <p className="text-xl">Your list is empty.</p>
-        <p className="text-sm mt-2">Search for manga and add them!</p>
+      <main className="p-6 text-center mt-24">
+        <p className="font-manga text-8xl text-red-700 opacity-30">漫画</p>
+        <p className="font-manga text-2xl text-gray-400 mt-4 tracking-widest">Your List Is Empty</p>
+        <p className="text-gray-500 text-sm mt-2">Search for manga and add them!</p>
       </main>
     )
   }
 
   return (
     <main className="max-w-5xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">My List</h2>
+      <h2 className="font-manga text-4xl text-red-500 mb-6 tracking-widest">My List</h2>
       {/* Saved manga card grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {items.map(manga => (
-          <div key={manga.id} className="bg-gray-800 rounded-lg overflow-hidden flex flex-col">
+          <div key={manga.id} className="bg-gray-900 border-2 border-gray-800 hover:border-red-600 rounded-lg overflow-hidden flex flex-col transition-all">
             <img src={manga.image} alt={manga.title} className="w-full object-cover h-48" />
             <div className="p-2 flex flex-col gap-2 flex-1">
               <p className="text-white text-sm font-medium line-clamp-2">{manga.title}</p>

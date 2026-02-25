@@ -22,3 +22,16 @@ export async function getMangaById(id: number, signal?: AbortSignal) {
   if (!res.ok) throw new Error(`Jikan error ${res.status}`)
   return res.json()
 }
+
+// Browse manga by genre ID
+export async function getMangaByGenre(genreId: number, page = 1, signal?: AbortSignal) {
+  const params = new URLSearchParams({
+    genres: String(genreId),
+    limit: '20',
+    page: String(page),
+    order_by: 'popularity',
+  })
+  const res = await fetch(`${BASE_URL}/manga?${params}`, { signal })
+  if (!res.ok) throw new Error(`Jikan error ${res.status}`)
+  return res.json()
+}

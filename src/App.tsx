@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       {/* Full app background */}
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen halftone text-white">
         {/* Top navigation bar */}
         <HeaderNav />
         <Routes>

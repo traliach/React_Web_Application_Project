@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Apply Inter font app-wide */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Bangers font for manga headings */
+.font-manga {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 0.05em;
+}
+
+/* Subtle halftone dot background */
+.halftone {
+  background-color: #0a0a0f;
+  background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
+  background-size: 24px 24px;
+}
