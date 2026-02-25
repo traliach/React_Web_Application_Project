@@ -23,6 +23,14 @@ export async function getMangaById(id: number, signal?: AbortSignal) {
   return res.json()
 }
 
+// Get top ranked manga (trending)
+export async function getTopManga(page = 1, signal?: AbortSignal) {
+  const params = new URLSearchParams({ limit: '20', page: String(page) })
+  const res = await fetch(`${BASE_URL}/top/manga?${params}`, { signal })
+  if (!res.ok) throw new Error(`Jikan error ${res.status}`)
+  return res.json()
+}
+
 // Browse manga by genre ID
 export async function getMangaByGenre(genreId: number, page = 1, signal?: AbortSignal) {
   const params = new URLSearchParams({

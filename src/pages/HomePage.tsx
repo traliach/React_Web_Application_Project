@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { searchManga, getMangaById, getMangaByGenre } from '../services/jikan'
+import { searchManga, getMangaById, getMangaByGenre, getTopManga } from '../services/jikan'
 import DetailsPanel from '../components/DetailsPanel'
 
 // Popular genre list with Jikan IDs
@@ -36,6 +36,10 @@ export default function HomePage() {
   const [hasSearched, setHasSearched] = useState(false)
   // Active genre filter (null = none)
   const [activeGenre, setActiveGenre] = useState<number | null>(null)
+  // True when showing top manga
+  const [showTrending, setShowTrending] = useState(false)
+  // Minimum score filter (0 = no filter)
+  const [minScore, setMinScore] = useState(0)
 
   // Live search after pause
   useEffect(() => {
@@ -48,8 +52,9 @@ export default function HomePage() {
       setPage(1)
       return
     }
-    // Clear genre when typing
+    // Clear genre and trending when typing
     setActiveGenre(null)
+    setShowTrending(false)
 
     const timeoutId = setTimeout(() => {
       setPage(1)
@@ -107,6 +112,33 @@ export default function HomePage() {
     setSelected(data.data)
   }
 
+  // Load top ranked manga
+  async function handleTrending() {
+    if (showTrending) {
+      setShowTrending(false)
+      setResults([])
+      setHasSearched(false)
+      return
+    }
+    setShowTrending(true)
+    setActiveGenre(null)
+    setQuery('')
+    setLoading(true)
+    setError('')
+    setResults([])
+    setPage(1)
+    try {
+      const data = await getTopManga(1)
+      setResults(data.data ?? [])
+      setLastPage(data.pagination.last_visible_page)
+      setHasSearched(true)
+    } catch {
+      setError('Something went wrong. Try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Filter by genre chip click
   async function handleGenreClick(genreId: number) {
     // Click same genre again to clear it
@@ -117,6 +149,7 @@ export default function HomePage() {
       return
     }
     setActiveGenre(genreId)
+    setShowTrending(false)
     setQuery('')
     setLoading(true)
     setError('')
@@ -152,6 +185,35 @@ export default function HomePage() {
             {genre.name}
           </button>
         ))}
+      </div>
+
+      {/* Trending button + score filter row */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <button
+          onClick={handleTrending}
+          className={`px-4 py-1 rounded-full text-sm font-medium border transition-all ${
+            showTrending
+              ? 'bg-red-600 border-red-500 text-white'
+              : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-red-500 hover:text-red-400'
+          }`}
+        >
+          Trending
+        </button>
+        <div className="flex items-center gap-2 ml-auto">
+          {/* Filter visible results by minimum score */}
+          <label className="text-gray-400 text-sm">Min score:</label>
+          <select
+            value={minScore}
+            onChange={e => setMinScore(Number(e.target.value))}
+            className="bg-gray-900 border border-gray-700 text-white text-sm px-2 py-1 rounded-lg"
+          >
+            <option value={0}>All</option>
+            <option value={6}>6+</option>
+            <option value={7}>7+</option>
+            <option value={8}>8+</option>
+            <option value={9}>9+</option>
+          </select>
+        </div>
       </div>
 
       {/* Search form row */}
@@ -194,7 +256,9 @@ export default function HomePage() {
 
       {/* Manga cards grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {!loading && results.map(manga => (
+        {!loading && results
+          .filter(manga => minScore === 0 || (manga.score ?? 0) >= minScore)
+          .map(manga => (
           <div key={manga.mal_id} onClick={() => handleCardClick(manga.mal_id)} className="bg-gray-900 border-2 border-gray-800 rounded-lg overflow-hidden cursor-pointer hover:border-red-500 hover:shadow-lg hover:shadow-red-900/40 transition-all">
             <img
               src={manga.images.jpg.image_url}

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState } from '../store/store'
-import { removeFromList, cycleStatus } from '../store/listSlice'
+import { removeFromList, cycleStatus, toggleFavorite } from '../store/listSlice'
 import type { Status } from '../store/listSlice'
 
 // Color for each status
@@ -37,6 +37,14 @@ export default function MyListPage() {
             <img src={manga.image} alt={manga.title} className="w-full object-cover h-48" />
             <div className="p-2 flex flex-col gap-2 flex-1">
               <p className="text-white text-sm font-medium line-clamp-2">{manga.title}</p>
+              {/* Favorite heart toggle */}
+              <button
+                onClick={() => dispatch(toggleFavorite(manga.id))}
+                className={`text-lg leading-none ${manga.favorite ? 'text-red-500' : 'text-gray-600 hover:text-red-400'}`}
+                aria-label="Toggle favorite"
+              >
+                {manga.favorite ? '♥' : '♡'}
+              </button>
               {/* Click to change status */}
               <button
                 onClick={() => dispatch(cycleStatus(manga.id))}

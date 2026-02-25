@@ -10,6 +10,7 @@ export interface SavedManga {
   title: string
   image: string
   status: Status
+  favorite: boolean
 }
 
 // List state type
@@ -24,11 +25,16 @@ const listSlice = createSlice({
   initialState,
   reducers: {
     // Add manga if new
-    addToList(state, action: PayloadAction<Omit<SavedManga, 'status'>>) {
+    addToList(state, action: PayloadAction<Omit<SavedManga, 'status' | 'favorite'>>) {
       const exists = state.items.find(m => m.id === action.payload.id)
       if (!exists) {
-        state.items.push({ ...action.payload, status: 'Plan to Read' })
+        state.items.push({ ...action.payload, status: 'Plan to Read', favorite: false })
       }
+    },
+    // Toggle favorite on/off
+    toggleFavorite(state, action: PayloadAction<number>) {
+      const manga = state.items.find(m => m.id === action.payload)
+      if (manga) manga.favorite = !manga.favorite
     },
     // Remove manga by id
     removeFromList(state, action: PayloadAction<number>) {
@@ -46,5 +52,5 @@ const listSlice = createSlice({
 })
 
 // Export action creators
-export const { addToList, removeFromList, cycleStatus } = listSlice.actions
+export const { addToList, removeFromList, cycleStatus, toggleFavorite } = listSlice.actions
 export default listSlice.reducer
