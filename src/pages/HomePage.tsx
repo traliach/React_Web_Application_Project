@@ -69,10 +69,26 @@ export default function HomePage() {
         </button>
       </form>
 
-      {error && <p className="text-red-400 mb-4">{error}</p>}
+      {error && (
+        <div className="bg-red-900/40 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-4 flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => fetchPage(query, page)} className="underline text-sm">Retry</button>
+        </div>
+      )}
+
+      {loading && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="bg-gray-800 rounded-lg overflow-hidden animate-pulse">
+              <div className="h-48 bg-gray-700" />
+              <div className="p-2 h-4 bg-gray-700 rounded mt-2 mx-2" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {results.map(manga => (
+        {!loading && results.map(manga => (
           <div key={manga.mal_id} onClick={() => handleCardClick(manga.mal_id)} className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500 transition-all">
             <img
               src={manga.images.jpg.image_url}
@@ -85,6 +101,10 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+
+      {!loading && results.length === 0 && query && (
+        <p className="text-center text-gray-500 mt-20">No results for "{query}".</p>
+      )}
 
       {results.length > 0 && (
         <div className="flex items-center justify-center gap-4 mt-8">
