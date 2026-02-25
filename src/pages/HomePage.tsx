@@ -6,20 +6,40 @@ export default function HomePage() {
   const [results, setResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const [lastPage, setLastPage] = useState(1)
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    if (!query.trim()) return
+  async function fetchPage(q: string, p: number) {
     setLoading(true)
     setError('')
     try {
-      const data = await searchManga(query.trim())
+      const data = await searchManga(q, p)
       setResults(data.data)
+      setLastPage(data.pagination.last_visible_page)
     } catch (err) {
       setError('Something went wrong. Try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    if (!query.trim()) return
+    setPage(1)
+    fetchPage(query.trim(), 1)
+  }
+
+  function handlePrev() {
+    const p = page - 1
+    setPage(p)
+    fetchPage(query, p)
+  }
+
+  function handleNext() {
+    const p = page + 1
+    setPage(p)
+    fetchPage(query, p)
   }
 
   return (
@@ -57,6 +77,26 @@ export default function HomePage() {
           </div>
         ))}
       </div>
+
+      {results.length > 0 && (
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <button
+            onClick={handlePrev}
+            disabled={page === 1 || loading}
+            className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white px-5 py-2 rounded-lg"
+          >
+            ← Prev
+          </button>
+          <span className="text-gray-400 text-sm">Page {page} of {lastPage}</span>
+          <button
+            onClick={handleNext}
+            disabled={page === lastPage || loading}
+            className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white px-5 py-2 rounded-lg"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </main>
   )
 }
