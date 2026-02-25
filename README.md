@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# Manga Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A manga discovery and tracking app built with React, Redux Toolkit, and the Jikan API.
 
-Currently, two official plugins are available:
+## Live Link
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+_Add your Netlify URL here after deploying_
 
-## React Compiler
+## Technologies Used
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite
+- Tailwind CSS
+- Redux Toolkit + React Redux
+- React Router v7
+- Jikan API (unofficial MyAnimeList REST API)
 
-## Expanding the ESLint configuration
+## Approach
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Built as a single-page application with three views:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Search** — live search with debounce, cover grid, pagination
+- **Details panel** — slide-over with genres, score, author, synopsis
+- **My List** — saved manga with status cycling (Plan to Read → Reading → Completed)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+State is managed with Redux Toolkit. The list persists across page refreshes via `localStorage`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Usage
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Type any manga title in the search box — results appear automatically
+2. Click a card to open the details panel
+3. Click **+ Add to My List** to save it
+4. Go to **My List** to manage saved titles and cycle their status
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Unsolved Problems
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Jikan API has a rate limit (1 req/s); rapid typing may occasionally return empty results
+- No user authentication — list is local to the browser only
+
+## Setup
+
+```bash
+npm install
+npm run dev
 ```
