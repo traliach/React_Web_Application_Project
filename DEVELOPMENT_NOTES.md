@@ -467,6 +467,104 @@ src/
 
 ---
 
+## Step 14 — Trending
+
+Added a Trending button that loads the current top-ranked manga from Jikan's `/top/manga` endpoint. This gives users a way to discover popular titles without needing to search for anything.
+
+File changed: `src/services/jikan.ts` — added a new fetch function:
+```ts
+// Get top ranked manga from MyAnimeList
+export async function getTopManga(page = 1, signal?: AbortSignal) {
+  const params = new URLSearchParams({ limit: '20', page: String(page) })
+  const res = await fetch(`${BASE_URL}/top/manga?${params}`, { signal })
+  if (!res.ok) throw new Error(`Jikan error ${res.status}`)
+  return res.json()
+}
+```
+
+File changed: `src/pages/HomePage.tsx` — added `showTrending` state and a handler:
+```tsx
+// Clicking Trending loads top manga, clicking again clears it
+async function handleTrending() {
+  if (showTrending) {
+    setShowTrending(false)
+    setResults([])
+    return
+  }
+  setShowTrending(true)
+  const data = await getTopManga(1)
+  setResults(data.data ?? [])
+}
+```
+
+---
+
+## Step 15 — Score Filter
+
+Added a Min Score dropdown that filters the visible results by rating. It works on the client side — no extra API call is needed — by filtering the results array before rendering.
+
+File changed: `src/pages/HomePage.tsx` — added `minScore` state and filter in the render:
+```tsx
+// 0 means no filter, otherwise only show manga at or above the selected score
+const [minScore, setMinScore] = useState(0)
+
+// Applied when mapping results to cards
+results
+  .filter(manga => minScore === 0 || (manga.score ?? 0) >= minScore)
+  .map(manga => ( ... ))
+```
+
+The dropdown options are: All, 6+, 7+, 8+, 9+.
+
+---
+
+## Step 16 — Favorites
+
+Added a heart button to each saved manga card in My List. Clicking it toggles a `favorite` flag stored in Redux alongside the existing status field.
+
+File changed: `src/store/listSlice.ts` — added `favorite` field and `toggleFavorite` action:
+```ts
+// Added to the SavedManga interface
+favorite: boolean
+
+// New reducer action
+toggleFavorite(state, action: PayloadAction<number>) {
+  const manga = state.items.find(m => m.id === action.payload)
+  if (manga) manga.favorite = !manga.favorite
+},
+```
+
+File changed: `src/pages/MyListPage.tsx` — heart button on each card:
+```tsx
+<button
+  onClick={() => dispatch(toggleFavorite(manga.id))}
+  className={manga.favorite ? 'text-red-500' : 'text-gray-600'}
+>
+  {manga.favorite ? '♥' : '♡'}
+</button>
+```
+
+---
+
+## Step 17 — Footer
+
+Added a footer component that appears at the bottom of every page with the author handle and contact email.
+
+File created: `src/components/Footer.tsx`
+
+File changed: `src/App.tsx` — added `flex flex-col` to the outer div so the footer is always pushed to the bottom, and wrapped the routes in `flex-1`:
+```tsx
+<div className="min-h-screen halftone text-white flex flex-col">
+  <HeaderNav />
+  <div className="flex-1">
+    <Routes>...</Routes>
+  </div>
+  <Footer />
+</div>
+```
+
+---
+
 ## All Packages Installed
 
 ```bash
