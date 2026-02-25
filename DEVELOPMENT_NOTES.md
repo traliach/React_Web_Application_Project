@@ -1,68 +1,66 @@
 # Manga Hub — Development Notes
 
-A step-by-step record of everything we built, installed, and decided during this project.
-Each step includes what we did, which files changed, and small code examples.
+A step-by-step record of every major decision, installation, and code change made during this project.
+Each step shows what changed, which file was affected, and a small example of the actual code.
 
 ---
 
 ## Step 1 — Create the Project
 
-**What we did:**
-Set up a brand new React app using Vite inside the existing git repo folder.
+Set up a new React app using Vite inside the existing git repo folder.
 
-**Why Vite?**
-Vite is much faster than Create React App. It starts the dev server instantly and reloads the browser the moment you save a file.
+Vite was chosen over Create React App because it starts the dev server much faster and reloads the browser the moment a file is saved.
 
-**Commands:**
+Commands run:
 ```bash
 cd React_Web_Application_Project
 
-# Scaffold a new Vite + React + TypeScript project in the current folder
+# Scaffold a Vite + React + TypeScript project in the current folder
 npm create vite@latest . -- --template react-ts
 
-# Install all the default packages
+# Install the default packages
 npm install
 ```
 
-**Files Vite created for us:**
-- `index.html` — the one HTML page the whole app lives inside
-- `src/main.tsx` — the entry point; mounts the React app into the HTML
+Files Vite created automatically:
+- `index.html` — the single HTML page the whole app lives inside
+- `src/main.tsx` — the entry point that mounts React into the HTML
 - `src/App.tsx` — the root React component
-- `vite.config.ts` — Vite settings
-- `tsconfig.json` — TypeScript settings
+- `vite.config.ts` — Vite configuration
+- `tsconfig.json` — TypeScript configuration
 
 ---
 
 ## Step 2 — Add Tailwind CSS
 
-**What we did:**
-Installed Tailwind CSS so we can style everything using class names like `bg-red-600` and `rounded-lg` instead of writing separate CSS files.
+Installed Tailwind CSS so everything can be styled using class names like `bg-red-600` and `rounded-lg` directly in the JSX, instead of writing separate CSS files.
 
-**Commands:**
+Commands run:
 ```bash
 # Install Tailwind and its required tools
 npm install -D tailwindcss@3 postcss autoprefixer
 
-# Create the config files automatically
+# Generate the config files
 npx tailwindcss init -p
 ```
 
-**File changed: `tailwind.config.js`**
-We told Tailwind which files to scan so it only includes the CSS classes we actually use:
+File changed: `tailwind.config.js`
+
+Told Tailwind which files to scan so it only ships CSS classes that are actually used:
 ```js
-// tailwind.config.js
 export default {
-  // Look inside these files for Tailwind class names
+  // Look inside these files for class names
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: { extend: {} },
   plugins: [],
 }
 ```
 
-**File changed: `src/index.css`**
-Replaced all the default Vite styles with three Tailwind lines:
+File changed: `src/index.css`
+
+Replaced all default Vite styles with these three lines:
 ```css
-/* These three lines load all of Tailwind's styles */
+/* These three lines load all of Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -70,23 +68,23 @@ Replaced all the default Vite styles with three Tailwind lines:
 
 ---
 
-## Step 3 — Add React Router (Page Navigation)
+## Step 3 — Add React Router
 
-**What we did:**
-Installed React Router so the app can show different pages without reloading the browser.
+Installed React Router so the app can move between pages without reloading the browser.
 
-**Command:**
+Command run:
 ```bash
 npm install react-router-dom
 ```
 
-**Files created:**
-- `src/pages/HomePage.tsx` — the Search page (shown at `/`)
-- `src/pages/MyListPage.tsx` — the My List page (shown at `/my-list`)
+Files created:
+- `src/pages/HomePage.tsx` — the Search page, shown at the `/` route
+- `src/pages/MyListPage.tsx` — the My List page, shown at `/my-list`
 - `src/components/HeaderNav.tsx` — the top navigation bar
 
-**File changed: `src/App.tsx`**
-Wrapped the whole app in `<BrowserRouter>` and defined the two routes:
+File changed: `src/App.tsx`
+
+Wrapped the app in `BrowserRouter` and defined the two routes:
 ```tsx
 // App.tsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -95,7 +93,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen halftone text-white">
-        <HeaderNav />  {/* Always visible at the top */}
+        <HeaderNav />
         <Routes>
           {/* Search home page */}
           <Route path="/" element={<HomePage />} />
@@ -110,25 +108,25 @@ function App() {
 
 ---
 
-## Step 4 — Choose the Right API
+## Step 4 — Choose the API
 
-**What we did:**
-We tested both Kitsu and Jikan APIs live before writing any code.
+Both Kitsu and Jikan were tested live before any code was written.
 
-**Why we chose Jikan over Kitsu:**
+Why Jikan was chosen over Kitsu:
 
-| | Kitsu | Jikan ✅ |
+| Field | Kitsu | Jikan |
 |---|---|---|
 | Search "naruto" top result | A spin-off novel | Naruto (correct) |
-| Chapters | 5 | 700 |
+| Chapter count | 5 | 700 |
 | Author included | No | Yes |
 | Genres included | No | Yes |
-| Score / popularity | No | Yes |
+| Score and popularity | No | Yes |
 
-**File created: `src/services/jikan.ts`**
-All API calls live in one file so we never repeat fetch logic:
+File created: `src/services/jikan.ts`
+
+All API calls go through one file so fetch logic is never repeated:
 ```ts
-// The base address for every API call
+// The base address for every request
 const BASE_URL = 'https://api.jikan.moe/v4'
 
 // Search manga by text
@@ -140,48 +138,45 @@ export async function searchManga(query: string, page = 1) {
 }
 ```
 
-> **Jikan API docs:** https://docs.api.jikan.moe/
+Jikan API docs: https://docs.api.jikan.moe/
 
 ---
 
 ## Step 5 — Build the Search Page
 
-**What we did:**
-Wired the search input to the Jikan API. Results appear automatically as the user types (called "debouncing" — we wait 500ms after they stop typing before fetching).
+Wired the search input to the Jikan API. Results appear automatically as the user types. This technique is called debouncing — the code waits 500ms after the user stops typing before making the request, so the API is not called on every single keystroke.
 
-**Key React concepts used:**
+React concepts used:
 
-| Concept | How we used it |
+| Concept | How it was used |
 |---|---|
-| `useState` | Store the query text, results array, loading flag, error message |
-| `useEffect` | Watch the query and trigger a search after 500ms pause |
-| `async/await` | Make the API call without blocking the page |
-| `try/catch/finally` | Handle errors gracefully, always stop loading spinner |
+| `useState` | Stores the query text, results, loading flag, error message |
+| `useEffect` | Watches the query and triggers a search after a 500ms pause |
+| `async/await` | Makes the API call without freezing the page |
+| `try/catch/finally` | Handles errors and always stops the loading state |
 
-**File changed: `src/pages/HomePage.tsx`**
+File changed: `src/pages/HomePage.tsx`
 ```tsx
-// Wait 500ms after the user stops typing, then search
+// Runs every time the query value changes
 useEffect(() => {
   const cleanQuery = query.trim()
   if (cleanQuery === '') return
 
   const timeoutId = setTimeout(() => {
-    fetchPage(cleanQuery, 1) // fetch page 1
-  }, 500)
+    fetchPage(cleanQuery, 1)
+  }, 500) // wait 500ms before fetching
 
   return () => clearTimeout(timeoutId) // cancel if user keeps typing
-}, [query]) // re-run every time query changes
+}, [query])
 ```
 
 ---
 
 ## Step 6 — Add Pagination
 
-**What we did:**
-Added Prev / Next buttons that load the previous or next page of results.
+Added Prev and Next buttons that load a different page of results from the API.
 
-**How Jikan pagination works:**
-Every response includes a `pagination` object:
+Every Jikan response includes a pagination object:
 ```json
 {
   "pagination": {
@@ -192,9 +187,9 @@ Every response includes a `pagination` object:
 }
 ```
 
-We save `last_visible_page` in state and use it to disable the Next button on the last page.
+The `last_visible_page` value is saved in state and used to disable the Next button on the final page.
 
-**File changed: `src/pages/HomePage.tsx`**
+File changed: `src/pages/HomePage.tsx`
 ```tsx
 // Go to previous page
 function handlePrev() {
@@ -215,20 +210,19 @@ function handleNext() {
 
 ## Step 7 — Add the Details Slide-Over Panel
 
-**What we did:**
-Clicking a manga card fetches its full details and shows a panel that slides in from the right side of the screen.
+Clicking a manga card fetches that manga's full details and opens a panel that slides in from the right side of the screen.
 
-**File created: `src/components/DetailsPanel.tsx`**
+File created: `src/components/DetailsPanel.tsx`
 
-The panel uses CSS `fixed` positioning to float over the page:
+The panel uses `fixed` positioning so it floats over the page content:
 ```tsx
-// fixed = stays in place even when page scrolls
-// inset-0 = covers the full screen
-// z-50 = appears on top of everything
+// fixed = stays in place even when the page scrolls
+// inset-0 = stretches to cover the full screen
+// z-50 = appears on top of all other elements
 <div className="fixed inset-0 z-50 flex justify-end">
-  {/* The dark clickable overlay */}
+  {/* Dark overlay — clicking it closes the panel */}
   <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-  {/* The white panel on the right */}
+  {/* The panel itself on the right side */}
   <aside className="relative w-full max-w-md bg-gray-950 ...">
     ...
   </aside>
@@ -237,35 +231,35 @@ The panel uses CSS `fixed` positioning to float over the page:
 
 ---
 
-## Step 8 — Add Redux (Global State)
+## Step 8 — Add Redux
 
-**What we did:**
-Installed Redux Toolkit so the saved manga list is available on every page, not just the one component that created it.
+Installed Redux Toolkit so the saved manga list is available on every page, not just inside one component.
 
-**Command:**
+Command run:
 ```bash
 npm install @reduxjs/toolkit react-redux
 ```
 
-**File created: `src/store/listSlice.ts`**
-A "slice" is one piece of the global state with its own actions:
+File created: `src/store/listSlice.ts`
+
+A slice is one section of the global state. This one has three actions:
 ```ts
 const listSlice = createSlice({
   name: 'list',
   initialState: { items: [] },
   reducers: {
-    // Add manga if new
+    // Add manga if it is not already saved
     addToList(state, action) {
       const exists = state.items.find(m => m.id === action.payload.id)
       if (!exists) {
         state.items.push({ ...action.payload, status: 'Plan to Read' })
       }
     },
-    // Remove manga by id
+    // Remove a manga by its ID
     removeFromList(state, action) {
       state.items = state.items.filter(m => m.id !== action.payload)
     },
-    // Move to next status
+    // Move to the next reading status
     cycleStatus(state, action) {
       const manga = state.items.find(m => m.id === action.payload)
       if (!manga) return
@@ -277,15 +271,16 @@ const listSlice = createSlice({
 })
 ```
 
-**File created: `src/store/store.ts`**
+File created: `src/store/store.ts`
 ```ts
 export const store = configureStore({
   reducer: { list: listReducer },
 })
 ```
 
-**File changed: `src/main.tsx`**
-Wrapped the app in `<Provider>` so every component can access the store:
+File changed: `src/main.tsx`
+
+Wrapped the app in `Provider` so every component can read from and write to the store:
 ```tsx
 <Provider store={store}>
   <App />
@@ -296,30 +291,27 @@ Wrapped the app in `<Provider>` so every component can access the store:
 
 ## Step 9 — localStorage Persistence
 
-**What we did:**
-Made the saved list survive page refreshes by saving it to `localStorage` (the browser's built-in key/value storage).
+Made the saved list survive page refreshes by reading from and writing to `localStorage`, which is the browser's built-in key/value storage.
 
-**File changed: `src/store/store.ts`**
-
-Two additions — load saved data when the store is created, and save every time it changes:
+File changed: `src/store/store.ts`
 ```ts
-// 1. Load saved list from browser storage
+// Load the saved list from the browser when the app starts
 function loadList() {
   try {
     const raw = localStorage.getItem('mangaList')
     return raw ? { list: JSON.parse(raw) } : undefined
   } catch {
-    return undefined // if data is corrupted, start fresh
+    return undefined // if the data is corrupted, start with an empty list
   }
 }
 
-// 2. Create store with saved data as starting point
+// Create the store and pre-fill it with the saved list
 export const store = configureStore({
   reducer: { list: listReducer },
-  preloadedState: loadList(), // start with saved list
+  preloadedState: loadList(),
 })
 
-// 3. Save to storage after every change
+// After every change, save the updated list to localStorage
 store.subscribe(() => {
   localStorage.setItem('mangaList', JSON.stringify(store.getState().list))
 })
@@ -329,27 +321,25 @@ store.subscribe(() => {
 
 ## Step 10 — My List Page
 
-**What we did:**
-Built the My List page. It reads the Redux store and shows all saved manga with status chips and remove buttons.
+Built the My List page. It reads from the Redux store and displays all saved manga with status chips and remove buttons.
 
-**File changed: `src/pages/MyListPage.tsx`**
+File changed: `src/pages/MyListPage.tsx`
 
-Reading from Redux uses two hooks:
+Two Redux hooks are used to read and update state:
 ```tsx
-const dispatch = useDispatch()  // lets us call actions
-const items = useSelector((state) => state.list.items) // reads data
+const dispatch = useDispatch()  // used to call actions like removeFromList
+const items = useSelector((state) => state.list.items) // reads the saved list
 ```
 
 ---
 
-## Step 11 — Loading Skeletons + Error Banner + Empty State
+## Step 11 — Loading Skeletons, Error Banner, Empty State
 
-**What we did:**
-Added UI feedback for every possible state: loading, error, and no results.
+Added feedback for every loading, error, and empty scenario so the app never just shows a blank screen.
 
-**Loading skeletons** (`src/pages/HomePage.tsx`):
+Loading skeletons in `src/pages/HomePage.tsx`:
 ```tsx
-{/* Show 8 grey pulsing cards while loading */}
+{/* While loading, show 8 grey pulsing placeholder cards */}
 {loading && (
   <div className="grid grid-cols-4 gap-4">
     {Array.from({ length: 8 }).map((_, i) => (
@@ -361,11 +351,12 @@ Added UI feedback for every possible state: loading, error, and no results.
 )}
 ```
 
-**Error banner** (`src/pages/HomePage.tsx`):
+Error banner in `src/pages/HomePage.tsx`:
 ```tsx
 {error && (
   <div className="bg-red-900/40 border border-red-500 text-red-300 ...">
     <span>{error}</span>
+    {/* Retry button calls the same fetch function again */}
     <button onClick={() => fetchPage(query, page)}>Retry</button>
   </div>
 )}
@@ -373,33 +364,32 @@ Added UI feedback for every possible state: loading, error, and no results.
 
 ---
 
-## Step 12 — Manga Theme UI
+## Step 12 — Manga Theme
 
-**What we did:**
-Redesigned the app to look like a manga app.
+Redesigned the visual style to match a manga aesthetic.
 
-**File changed: `index.html`** — added Google Fonts:
+File changed: `index.html` — added Google Fonts:
 ```html
 <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
 ```
 
-**File changed: `src/index.css`** — added halftone background + font helpers:
+File changed: `src/index.css` — halftone background and font helper class:
 ```css
-/* Subtle halftone dot background like manga pages */
+/* Dot pattern background, common in printed manga */
 .halftone {
   background-color: #0a0a0f;
   background-image: radial-gradient(circle, #ffffff08 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Comic-book style font class */
+/* Apply the Bangers font to any element */
 .font-manga {
   font-family: 'Bangers', cursive;
   letter-spacing: 0.05em;
 }
 ```
 
-**File changed: `src/components/HeaderNav.tsx`** — manga logo with kanji:
+File changed: `src/components/HeaderNav.tsx` — manga-style logo with kanji:
 ```tsx
 <span className="font-manga text-3xl text-red-500 tracking-widest">
   漫画 Manga Hub
@@ -410,15 +400,14 @@ Redesigned the app to look like a manga app.
 
 ## Step 13 — Genre Filter Chips
 
-**What we did:**
-Added genre chips above the search bar so users can browse by theme even if they don't know a manga's name.
+Added genre chips above the search bar so users can browse by theme without knowing a specific title.
 
-**File changed: `src/services/jikan.ts`** — added genre fetch function:
+File changed: `src/services/jikan.ts` — added a genre fetch function:
 ```ts
-// Browse manga by genre ID
+// Fetch manga filtered by a genre ID, sorted by popularity
 export async function getMangaByGenre(genreId: number, page = 1) {
   const params = new URLSearchParams({
-    genres: String(genreId), // Jikan uses numeric genre IDs
+    genres: String(genreId), // Jikan identifies genres by number
     limit: '20',
     page: String(page),
     order_by: 'popularity',
@@ -429,20 +418,21 @@ export async function getMangaByGenre(genreId: number, page = 1) {
 }
 ```
 
-**File changed: `src/pages/HomePage.tsx`** — genre list and click handler:
+File changed: `src/pages/HomePage.tsx` — genre list and click handler:
 ```tsx
-// Genre names mapped to Jikan's numeric IDs
+// Each genre maps to a numeric ID that Jikan recognizes
 const GENRES = [
-  { id: 1,  name: '⚔️ Action' },
-  { id: 22, name: '💕 Romance' },
-  { id: 14, name: '👻 Horror' },
-  // ... more genres
+  { id: 1,  name: 'Action' },
+  { id: 22, name: 'Romance' },
+  { id: 14, name: 'Horror' },
+  // ...more genres
 ]
 
-// Called when a genre chip is clicked
+// Clicking a chip fetches that genre's manga
+// Clicking the same chip again clears the filter
 async function handleGenreClick(genreId: number) {
   if (activeGenre === genreId) {
-    setActiveGenre(null) // click again to clear
+    setActiveGenre(null)
     setResults([])
     return
   }
@@ -460,19 +450,19 @@ async function handleGenreClick(genreId: number) {
 ```
 src/
 ├── components/
-│   ├── HeaderNav.tsx       ← Top nav, links, manga logo
-│   └── DetailsPanel.tsx    ← Slide-over with manga info
+│   ├── HeaderNav.tsx       -- top nav bar, links, manga logo
+│   └── DetailsPanel.tsx    -- slide-over panel with manga info
 ├── pages/
-│   ├── HomePage.tsx        ← Search bar, genre chips, results grid
-│   └── MyListPage.tsx      ← Saved manga with status chips
+│   ├── HomePage.tsx        -- search bar, genre chips, results grid
+│   └── MyListPage.tsx      -- saved manga with status chips
 ├── services/
-│   └── jikan.ts            ← All API fetch functions
+│   └── jikan.ts            -- all API fetch functions
 ├── store/
-│   ├── listSlice.ts        ← Redux actions: add, remove, cycleStatus
-│   └── store.ts            ← Redux store + localStorage save/load
-├── App.tsx                 ← Router + page layout
-├── main.tsx                ← App entry point, Redux Provider
-└── index.css               ← Tailwind + halftone + font helpers
+│   ├── listSlice.ts        -- Redux actions: add, remove, cycleStatus
+│   └── store.ts            -- Redux store and localStorage logic
+├── App.tsx                 -- router and page layout
+├── main.tsx                -- app entry point, Redux Provider
+└── index.css               -- Tailwind directives, halftone, font helpers
 ```
 
 ---
@@ -480,10 +470,10 @@ src/
 ## All Packages Installed
 
 ```bash
-# Step 1 — Vite scaffolded these automatically
+# Vite scaffolded these in Step 1
 react, react-dom, typescript, vite, @types/react, @types/react-dom
 
-# Step 2 — Tailwind
+# Step 2 — Tailwind CSS
 npm install -D tailwindcss@3 postcss autoprefixer
 
 # Step 3 — React Router
