@@ -50,6 +50,7 @@ export default function HomePage() {
   }
 
   return (
+    <>
     <main className="max-w-5xl mx-auto p-6">
       <form onSubmit={handleSearch} className="flex gap-2 mb-8">
         <input
@@ -107,5 +108,6 @@ export default function HomePage() {
     </main>
 
     {selected && <DetailsPanel manga={selected} onClose={() => setSelected(null)} />}
+    </>
   )
 }
