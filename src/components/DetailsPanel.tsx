@@ -1,9 +1,27 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { addToList, removeFromList } from '../store/listSlice'
+import type { RootState } from '../store/store'
+
 interface Props {
   manga: any
   onClose: () => void
 }
 
 export default function DetailsPanel({ manga, onClose }: Props) {
+  const dispatch = useDispatch()
+  const saved = useSelector((s: RootState) => s.list.items.find(m => m.id === manga.mal_id))
+
+  function handleToggle() {
+    if (saved) {
+      dispatch(removeFromList(manga.mal_id))
+    } else {
+      dispatch(addToList({
+        id: manga.mal_id,
+        title: manga.title,
+        image: manga.images.jpg.image_url,
+      }))
+    }
+  }
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
@@ -36,6 +54,12 @@ export default function DetailsPanel({ manga, onClose }: Props) {
             <p><span className="text-gray-200 font-medium">Author:</span> {manga.authors[0].name}</p>
           )}
         </div>
+        <button
+          onClick={handleToggle}
+          className={`w-full py-2 rounded-lg font-semibold text-white ${saved ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+        >
+          {saved ? 'Remove from List' : '+ Add to My List'}
+        </button>
         <p className="text-gray-300 text-sm leading-relaxed line-clamp-6">{manga.synopsis}</p>
       </aside>
     </div>
