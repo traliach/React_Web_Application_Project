@@ -1,21 +1,21 @@
 import { NavLink } from 'react-router-dom'
 
-// Styles active vs inactive links
+// Nav link text style
 const link = ({ isActive }: { isActive: boolean }) =>
   isActive
     ? 'text-indigo-400 font-semibold'
     : 'text-gray-300 hover:text-white transition-colors'
 
-// Top navigation bar component
+// Top app navigation
 export default function HeaderNav() {
   return (
     <header className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-      {/* App logo/title */}
+      {/* App name text */}
       <span className="text-xl font-bold text-indigo-400">Manga Hub</span>
       <nav className="flex gap-6">
-        {/* Link to search page */}
+        {/* Go to search page */}
         <NavLink to="/" end className={link}>Search</NavLink>
-        {/* Link to saved list */}
+        {/* Go to saved list */}
         <NavLink to="/my-list" className={link}>My List</NavLink>
       </nav>
     </header>

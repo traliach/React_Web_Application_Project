@@ -2,19 +2,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToList, removeFromList } from '../store/listSlice'
 import type { RootState } from '../store/store'
 
-// Props this component expects
+// Props from parent page
 interface Props {
   manga: any
   onClose: () => void
 }
 
-// Slide-over panel for manga details
+// Right-side details panel
 export default function DetailsPanel({ manga, onClose }: Props) {
   const dispatch = useDispatch()
-  // Check if manga is already saved
-  const saved = useSelector((s: RootState) => s.list.items.find(m => m.id === manga.mal_id))
+  // Read saved list items
+  const items = useSelector((s: RootState) => s.list.items)
+  // Check if manga saved
+  const saved = items.find(m => m.id === manga.mal_id)
 
-  // Add or remove from list
+  // Add or remove item
   function handleToggle() {
     if (saved) {
       dispatch(removeFromList(manga.mal_id))
@@ -28,12 +30,12 @@ export default function DetailsPanel({ manga, onClose }: Props) {
   }
 
   return (
-    // Dark overlay behind panel
+    // Dark background overlay
     <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Click overlay to close */}
+      {/* Click outside to close */}
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <aside className="relative w-full max-w-md bg-gray-900 h-full overflow-y-auto shadow-xl p-6 flex flex-col gap-4">
-        {/* Close button top right */}
+        {/* Close panel button */}
         <button
           onClick={onClose}
           aria-label="Close panel"
@@ -48,7 +50,7 @@ export default function DetailsPanel({ manga, onClose }: Props) {
           className="w-40 rounded-lg mx-auto"
         />
         <h2 className="text-xl font-bold text-white text-center">{manga.title}</h2>
-        {/* Genre tags row */}
+        {/* Genre chip buttons row */}
         <div className="flex flex-wrap gap-2 justify-center">
           {manga.genres?.map((g: any) => (
             <span key={g.mal_id} className="bg-indigo-700 text-white text-xs px-2 py-1 rounded-full">
@@ -56,7 +58,7 @@ export default function DetailsPanel({ manga, onClose }: Props) {
             </span>
           ))}
         </div>
-        {/* Key info fields */}
+        {/* Basic manga info block */}
         <div className="text-gray-400 text-sm space-y-1">
           <p><span className="text-gray-200 font-medium">Status:</span> {manga.status}</p>
           <p><span className="text-gray-200 font-medium">Chapters:</span> {manga.chapters ?? 'N/A'}</p>
@@ -72,7 +74,7 @@ export default function DetailsPanel({ manga, onClose }: Props) {
         >
           {saved ? 'Remove from List' : '+ Add to My List'}
         </button>
-        {/* Short synopsis text */}
+        {/* Short story description */}
         <p className="text-gray-300 text-sm leading-relaxed line-clamp-6">{manga.synopsis}</p>
       </aside>
     </div>

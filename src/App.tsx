@@ -3,18 +3,18 @@ import HeaderNav from './components/HeaderNav'
 import HomePage from './pages/HomePage'
 import MyListPage from './pages/MyListPage'
 
-// Root component with routing
+// Main app routes
 function App() {
   return (
     <BrowserRouter>
-      {/* Dark background for whole app */}
+      {/* Full app background */}
       <div className="min-h-screen bg-gray-950 text-white">
-        {/* Navigation bar at top */}
+        {/* Top navigation bar */}
         <HeaderNav />
         <Routes>
-          {/* Home = search page */}
+          {/* Search home page */}
           <Route path="/" element={<HomePage />} />
-          {/* My List page */}
+          {/* Saved list page */}
           <Route path="/my-list" element={<MyListPage />} />
         </Routes>
       </div>

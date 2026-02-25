@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
-// Three possible reading statuses
+// Reading status options
 export type Status = 'Plan to Read' | 'Reading' | 'Completed'
 
-// Shape of one saved manga
+// One saved manga item
 export interface SavedManga {
   id: number
   title: string
@@ -12,7 +12,7 @@ export interface SavedManga {
   status: Status
 }
 
-// Shape of the list state
+// List state type
 interface ListState {
   items: SavedManga[]
 }
@@ -23,18 +23,18 @@ const listSlice = createSlice({
   name: 'list',
   initialState,
   reducers: {
-    // Add manga if not saved
+    // Add manga if new
     addToList(state, action: PayloadAction<Omit<SavedManga, 'status'>>) {
       const exists = state.items.find(m => m.id === action.payload.id)
       if (!exists) {
         state.items.push({ ...action.payload, status: 'Plan to Read' })
       }
     },
-    // Remove manga by ID
+    // Remove manga by id
     removeFromList(state, action: PayloadAction<number>) {
       state.items = state.items.filter(m => m.id !== action.payload)
     },
-    // Rotate to next status
+    // Move to next status
     cycleStatus(state, action: PayloadAction<number>) {
       const manga = state.items.find(m => m.id === action.payload)
       if (!manga) return
@@ -45,6 +45,6 @@ const listSlice = createSlice({
   },
 })
 
-// Export actions for use in components
+// Export action creators
 export const { addToList, removeFromList, cycleStatus } = listSlice.actions
 export default listSlice.reducer

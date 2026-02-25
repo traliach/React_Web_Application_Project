@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import listReducer from './listSlice'
 
-// Load saved list from browser
+// Load list from storage
 function loadList() {
   try {
     const raw = localStorage.getItem('mangaList')
@@ -11,18 +11,18 @@ function loadList() {
   }
 }
 
-// Create the Redux store
+// Build Redux store
 export const store = configureStore({
   reducer: { list: listReducer },
-  // Start with saved data
+  // Start with saved list
   preloadedState: loadList(),
 })
 
-// Save list on every change
+// Save list after changes
 store.subscribe(() => {
   localStorage.setItem('mangaList', JSON.stringify(store.getState().list))
 })
 
-// Types used across the app
+// App-wide store types
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
