@@ -10,3 +10,9 @@ export async function searchManga(query: string, page = 1, signal?: AbortSignal)
   if (!res.ok) throw new Error(`Jikan error ${res.status}`)
   return res.json()
 }
+
+export async function getMangaById(id: number, signal?: AbortSignal) {
+  const res = await fetch(`${BASE_URL}/manga/${id}`, { signal })
+  if (!res.ok) throw new Error(`Jikan error ${res.status}`)
+  return res.json()
+}

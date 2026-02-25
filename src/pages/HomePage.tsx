@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { searchManga } from '../services/jikan'
+import { searchManga, getMangaById } from '../services/jikan'
+import DetailsPanel from '../components/DetailsPanel'
 
 export default function HomePage() {
   const [query, setQuery] = useState('')
@@ -8,6 +9,12 @@ export default function HomePage() {
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
+  const [selected, setSelected] = useState<any>(null)
+
+  async function handleCardClick(id: number) {
+    const data = await getMangaById(id)
+    setSelected(data.data)
+  }
 
   async function fetchPage(q: string, p: number) {
     setLoading(true)
@@ -65,7 +72,7 @@ export default function HomePage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {results.map(manga => (
-          <div key={manga.mal_id} className="bg-gray-800 rounded-lg overflow-hidden">
+          <div key={manga.mal_id} onClick={() => handleCardClick(manga.mal_id)} className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500 transition-all">
             <img
               src={manga.images.jpg.image_url}
               alt={manga.title}
@@ -98,5 +105,7 @@ export default function HomePage() {
         </div>
       )}
     </main>
+
+    {selected && <DetailsPanel manga={selected} onClose={() => setSelected(null)} />}
   )
 }
