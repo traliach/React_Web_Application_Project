@@ -9,7 +9,7 @@ Search any manga by title or genre, view details, and save titles to your person
 
 ## 🔗 Live Link
 
-_Paste your Netlify URL here after deploying_
+**https://celebrated-sprinkles-1b954a.netlify.app**
 
 ---
 
