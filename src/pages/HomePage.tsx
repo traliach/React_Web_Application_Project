@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { searchManga, getMangaById } from '../services/jikan'
 import DetailsPanel from '../components/DetailsPanel'
 
@@ -10,6 +10,18 @@ export default function HomePage() {
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
   const [selected, setSelected] = useState<any>(null)
+  const [hasSearched, setHasSearched] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!query.trim()) return
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setPage(1)
+      fetchPage(query.trim(), 1)
+    }, 500)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [query])
 
   async function handleCardClick(id: number) {
     const data = await getMangaById(id)
@@ -19,10 +31,12 @@ export default function HomePage() {
   async function fetchPage(q: string, p: number) {
     setLoading(true)
     setError('')
+    setResults([])
     try {
       const data = await searchManga(q, p)
-      setResults(data.data)
+      setResults(data.data ?? [])
       setLastPage(data.pagination.last_visible_page)
+      setHasSearched(true)
     } catch (err) {
       setError('Something went wrong. Try again.')
     } finally {
@@ -102,7 +116,7 @@ export default function HomePage() {
         ))}
       </div>
 
-      {!loading && results.length === 0 && query && (
+      {!loading && hasSearched && results.length === 0 && (
         <p className="text-center text-gray-500 mt-20">No results for "{query}".</p>
       )}
 
