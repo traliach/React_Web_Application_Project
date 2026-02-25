@@ -1,5 +1,611 @@
 # Manga Hub — Development Notes
 
+This document is a student-friendly record of the **main steps** we completed to build Manga Hub.
+It avoids repeating the same idea many times, but still shows what we installed, what files we changed, and why.
+
+---
+
+## What we built (quick summary)
+
+- **Search** manga by title (results show as you type)
+- **Browse by theme** using genre chips (Action, Romance, Horror, etc.)
+- **Trending (🔥)** button to load top-ranked manga
+- **Details slide-over panel** when you click a manga card
+- **My List** page with:
+  - Add / remove manga
+  - Reading status cycle (Plan → Reading → Completed)
+  - Favorite toggle (heart)
+- **localStorage** persistence (your list stays after refresh)
+- Manga-style UI (font + halftone background + red/black theme)
+- Footer credit shown on every page
+
+---
+
+## Main tools / tech used
+
+- **React + TypeScript** (components, state, props, typing)
+- **Vite** (fast dev server + build)
+- **Tailwind CSS** (utility classes for styling)
+- **React Router** (pages: `/` and `/my-list`)
+- **Redux Toolkit** (global state for saved list)
+- **Jikan API** (AJAX `fetch()` calls for manga data)
+
+---
+
+## Install + run commands (Git Bash)
+
+```bash
+# install dependencies
+npm install
+
+# run dev server
+npm run dev
+
+# create production build
+npm run build
+```
+
+---
+
+## Step-by-step (major milestones)
+
+### Step 1 — Create the Vite React app
+
+**Goal**: start a React + TypeScript project quickly.
+
+```bash
+npm create vite@latest . -- --template react-ts
+npm install
+```
+
+**Key files Vite gives you**:
+- `index.html`
+- `src/main.tsx`
+- `src/App.tsx`
+
+---
+
+### Step 2 — Add Tailwind CSS
+
+**Goal**: style in JSX using Tailwind classes.
+
+```bash
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+```
+
+**Files changed**:
+- `tailwind.config.js` (content paths)
+- `src/index.css` (Tailwind directives)
+
+Small example (`src/index.css`):
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+### Step 3 — Add React Router (pages)
+
+**Goal**: switch pages without reloading.
+
+```bash
+npm install react-router-dom
+```
+
+**Files created**:
+- `src/pages/HomePage.tsx` (search page)
+- `src/pages/MyListPage.tsx` (saved list page)
+- `src/components/HeaderNav.tsx` (navigation)
+
+**File changed**:
+- `src/App.tsx` (routes)
+
+---
+
+### Step 4 — Choose an API (Jikan)
+
+We compared Kitsu vs Jikan and picked **Jikan** because it gave better manga results + fields.
+
+**File created**:
+- `src/services/jikan.ts` (one place for all API calls)
+
+**API docs**: `https://docs.api.jikan.moe/`
+
+---
+
+### Step 5 — Home page search (AJAX) + debounce
+
+**Goal**: when the user types, fetch results (but not on every keystroke).
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+Core idea (debounce):
+
+```ts
+setTimeout(() => fetchPage(query, 1), 500)
+```
+
+---
+
+### Step 6 — Pagination
+
+**Goal**: Prev / Next buttons to load other pages from the API.
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+We store `page` and `last_visible_page` in state and disable buttons when needed.
+
+---
+
+### Step 7 — Details slide-over panel
+
+**Goal**: click a card → see full manga info without leaving the page.
+
+**File created**:
+- `src/components/DetailsPanel.tsx`
+
+The panel is `fixed` so it sits on top of the page, and it has a dark overlay to close it.
+
+---
+
+### Step 8 — Add Redux Toolkit (My List state)
+
+**Goal**: saved list should be available on any page.
+
+```bash
+npm install @reduxjs/toolkit react-redux
+```
+
+**Files created**:
+- `src/store/listSlice.ts` (reducers/actions like add/remove/status/favorite)
+- `src/store/store.ts` (store setup)
+
+**File changed**:
+- `src/main.tsx` (wrap with `<Provider store={store}>`)
+
+---
+
+### Step 9 — Persist the list (localStorage)
+
+**Goal**: list should stay after refresh.
+
+**File changed**:
+- `src/store/store.ts`
+
+We load from localStorage when the store starts, and save again on every change.
+
+---
+
+### Step 10 — My List page UI (status + remove + favorite)
+
+**Goal**: show saved manga cards and allow actions.
+
+**File changed**:
+- `src/pages/MyListPage.tsx`
+
+My List uses Redux hooks:
+- `useSelector` to read `items`
+- `useDispatch` to run actions
+
+---
+
+### Step 11 — Loading, error, and empty states
+
+**Goal**: never show a blank screen.
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+We added:
+- loading skeleton cards
+- error banner with Retry
+- “no results” message (only after a search)
+
+---
+
+### Step 12 — Manga theme styling
+
+**Goal**: manga vibe (font + halftone background + bold red accents).
+
+**Files changed**:
+- `index.html` (Google font)
+- `src/index.css` (halftone background + helper classes)
+- `src/components/HeaderNav.tsx` (logo styling + kanji)
+
+---
+
+### Step 13 — Browse by theme (genre chips)
+
+**Goal**: if you don’t know a title, you can still browse.
+
+**Files changed**:
+- `src/services/jikan.ts` (genre fetch helper)
+- `src/pages/HomePage.tsx` (chip UI + handler)
+
+---
+
+### Step 14 — Trending (🔥)
+
+**Goal**: one click to load top manga.
+
+**Files changed**:
+- `src/services/jikan.ts` (top manga fetch helper)
+- `src/pages/HomePage.tsx` (Trending button + state)
+
+---
+
+### Step 15 — Favorites (heart)
+
+**Goal**: mark saved manga as a favorite.
+
+**Files changed**:
+- `src/store/listSlice.ts` (toggleFavorite action)
+- `src/pages/MyListPage.tsx` (heart button UI)
+
+---
+
+### Step 16 — Footer credit (mobile + desktop)
+
+**Goal**: show “Built by @traliach” on every page, including mobile.
+
+**Files changed**:
+- `src/components/Footer.tsx` (new component)
+- `src/App.tsx` (layout uses `flex flex-col` + `flex-1` so footer stays visible)
+
+---
+
+## Rating filter (attempted, then removed)
+
+We tried adding a “minimum score” filter (6+, 7+, 8+, 9+). We removed it because it **filtered only the current page** of results.
+
+- Example problem: you might see only 3 results on the page, but pagination still says something huge like “Page 1 of 4114” because the API pagination is for the unfiltered search.
+
+**Lesson learned**: filtering paginated data should usually happen on the **server/API**. If we bring it back later, we should use Jikan’s `min_score` query parameter so the API returns correct pagination.
+
+---
+
+## Final file structure (important files)
+
+```
+src/
+  components/
+    HeaderNav.tsx
+    DetailsPanel.tsx
+    Footer.tsx
+  pages/
+    HomePage.tsx
+    MyListPage.tsx
+  services/
+    jikan.ts
+  store/
+    listSlice.ts
+    store.ts
+  App.tsx
+  main.tsx
+  index.css
+```
+
+---
+
+## Packages installed (summary)
+
+```bash
+# Tailwind
+npm install -D tailwindcss@3 postcss autoprefixer
+
+# Router
+npm install react-router-dom
+
+# Redux
+npm install @reduxjs/toolkit react-redux
+```
+
+# Manga Hub — Development Notes
+
+This document is a student-friendly record of the **main steps** we completed to build Manga Hub.
+It avoids repeating the same idea many times, but still shows what we installed, what files we changed, and why.
+
+---
+
+## What we built (quick summary)
+
+- **Search** manga by title (results show as you type)
+- **Browse by theme** using genre chips (Action, Romance, Horror, etc.)
+- **Trending (🔥)** button to load top-ranked manga
+- **Details slide-over panel** when you click a manga card
+- **My List** page with:
+  - Add / remove manga
+  - Reading status cycle (Plan → Reading → Completed)
+  - Favorite toggle (heart)
+- **localStorage** persistence (your list stays after refresh)
+- Manga-style UI (font + halftone background + red/black theme)
+- Footer credit shown on every page
+
+---
+
+## Main tools / tech used
+
+- **React + TypeScript** (components, state, props, typing)
+- **Vite** (fast dev server + build)
+- **Tailwind CSS** (utility classes for styling)
+- **React Router** (pages: `/` and `/my-list`)
+- **Redux Toolkit** (global state for saved list)
+- **Jikan API** (AJAX `fetch()` calls for manga data)
+
+---
+
+## Install + run commands (Git Bash)
+
+```bash
+# install dependencies
+npm install
+
+# run dev server
+npm run dev
+
+# create production build
+npm run build
+```
+
+---
+
+## Step-by-step (major milestones)
+
+### Step 1 — Create the Vite React app
+
+**Goal**: start a React + TypeScript project quickly.
+
+```bash
+npm create vite@latest . -- --template react-ts
+npm install
+```
+
+**Key files Vite gives you**:
+- `index.html`
+- `src/main.tsx`
+- `src/App.tsx`
+
+---
+
+### Step 2 — Add Tailwind CSS
+
+**Goal**: style in JSX using Tailwind classes.
+
+```bash
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+```
+
+**Files changed**:
+- `tailwind.config.js` (content paths)
+- `src/index.css` (Tailwind directives)
+
+Small example (`src/index.css`):
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+### Step 3 — Add React Router (pages)
+
+**Goal**: switch pages without reloading.
+
+```bash
+npm install react-router-dom
+```
+
+**Files created**:
+- `src/pages/HomePage.tsx` (search page)
+- `src/pages/MyListPage.tsx` (saved list page)
+- `src/components/HeaderNav.tsx` (navigation)
+
+**File changed**:
+- `src/App.tsx` (routes)
+
+---
+
+### Step 4 — Choose an API (Jikan)
+
+We compared Kitsu vs Jikan and picked **Jikan** because it gave better manga results + fields.
+
+**File created**:
+- `src/services/jikan.ts` (one place for all API calls)
+
+**API docs**: `https://docs.api.jikan.moe/`
+
+---
+
+### Step 5 — Home page search (AJAX) + debounce
+
+**Goal**: when the user types, fetch results (but not on every keystroke).
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+Core idea (debounce):
+
+```ts
+setTimeout(() => fetchPage(query, 1), 500)
+```
+
+---
+
+### Step 6 — Pagination
+
+**Goal**: Prev / Next buttons to load other pages from the API.
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+We store `page` and `last_visible_page` in state and disable buttons when needed.
+
+---
+
+### Step 7 — Details slide-over panel
+
+**Goal**: click a card → see full manga info without leaving the page.
+
+**File created**:
+- `src/components/DetailsPanel.tsx`
+
+The panel is `fixed` so it sits on top of the page, and it has a dark overlay to close it.
+
+---
+
+### Step 8 — Add Redux Toolkit (My List state)
+
+**Goal**: saved list should be available on any page.
+
+```bash
+npm install @reduxjs/toolkit react-redux
+```
+
+**Files created**:
+- `src/store/listSlice.ts` (reducers/actions like add/remove/status/favorite)
+- `src/store/store.ts` (store setup)
+
+**File changed**:
+- `src/main.tsx` (wrap with `<Provider store={store}>`)
+
+---
+
+### Step 9 — Persist the list (localStorage)
+
+**Goal**: list should stay after refresh.
+
+**File changed**:
+- `src/store/store.ts`
+
+We load from localStorage when the store starts, and save again on every change.
+
+---
+
+### Step 10 — My List page UI (status + remove + favorite)
+
+**Goal**: show saved manga cards and allow actions.
+
+**File changed**:
+- `src/pages/MyListPage.tsx`
+
+My List uses Redux hooks:
+- `useSelector` to read `items`
+- `useDispatch` to run actions
+
+---
+
+### Step 11 — Loading, error, and empty states
+
+**Goal**: never show a blank screen.
+
+**File changed**:
+- `src/pages/HomePage.tsx`
+
+We added:
+- loading skeleton cards
+- error banner with Retry
+- “no results” message (only after a search)
+
+---
+
+### Step 12 — Manga theme styling
+
+**Goal**: manga vibe (font + halftone background + bold red accents).
+
+**Files changed**:
+- `index.html` (Google font)
+- `src/index.css` (halftone background + helper classes)
+- `src/components/HeaderNav.tsx` (logo styling + kanji)
+
+---
+
+### Step 13 — Browse by theme (genre chips)
+
+**Goal**: if you don’t know a title, you can still browse.
+
+**Files changed**:
+- `src/services/jikan.ts` (genre fetch helper)
+- `src/pages/HomePage.tsx` (chip UI + handler)
+
+---
+
+### Step 14 — Trending (🔥)
+
+**Goal**: one click to load top manga.
+
+**Files changed**:
+- `src/services/jikan.ts` (top manga fetch helper)
+- `src/pages/HomePage.tsx` (Trending button + state)
+
+---
+
+### Step 15 — Footer credit (mobile + desktop)
+
+**Goal**: show “Built by @traliach” on every page, including mobile.
+
+**Files changed**:
+- `src/components/Footer.tsx` (new component)
+- `src/App.tsx` (layout uses `flex flex-col` + `flex-1` so footer stays visible)
+
+---
+
+## Rating filter (attempted, then removed)
+
+We tried adding a “minimum score” filter (6+, 7+, 8+, 9+). We removed it because it **filtered only the current page** of results.
+
+- Example problem: you might see only 3 results on the page, but pagination still says something huge like “Page 1 of 4114” because the API pagination is for the unfiltered search.
+
+**Lesson learned**: filtering paginated data should usually happen on the **server/API**. If we bring it back later, we should use Jikan’s `min_score` query parameter so the API returns correct pagination.
+
+---
+
+## Final file structure (important files)
+
+```
+src/
+  components/
+    HeaderNav.tsx
+    DetailsPanel.tsx
+    Footer.tsx
+  pages/
+    HomePage.tsx
+    MyListPage.tsx
+  services/
+    jikan.ts
+  store/
+    listSlice.ts
+    store.ts
+  App.tsx
+  main.tsx
+  index.css
+```
+
+---
+
+## Packages installed (summary)
+
+```bash
+# Tailwind
+npm install -D tailwindcss@3 postcss autoprefixer
+
+# Router
+npm install react-router-dom
+
+# Redux
+npm install @reduxjs/toolkit react-redux
+```
+
+# Manga Hub — Development Notes
+
 A step-by-step record of every major decision, installation, and code change made during this project.
 Each step shows what changed, which file was affected, and a small example of the actual code.
 
@@ -579,8 +1185,8 @@ results
 The problem was that this only filtered the 20 results currently loaded on the page. The pagination counter still showed the full unfiltered total from Jikan (e.g. "Page 1 of 4114"), which was misleading. Selecting "Top Rated (9+)" would show only 3 cards but the pagination still implied thousands of pages.
 
 Attempts to fix it:
-- First tried resetting the page count when a filter was applied — but Jikan does not return a filtered page count.
-- Then tried hiding pagination while the filter was active and showing a note ("Showing filtered results from this page only") — but this made the feature feel incomplete and confusing.
+- First tried resetting the page count when a filter was applied , but Jikan does not return a filtered page count.
+- Then tried hiding pagination while the filter was active and showing a note ("Showing filtered results from this page only") , but this made the feature feel incomplete and confusing.
 
 The root cause is that accurate score filtering requires a server-side request with Jikan's `min_score` parameter so the API handles the filtering and returns the correct pagination. Client-side filtering of paginated data is not reliable.
 
