@@ -42,6 +42,8 @@ Built as the SBA 320H React Web Application Project at Per Scholas.
 - Loading skeletons — placeholder cards show while data is loading
 - Error banner — shows a message and a Retry button if a request fails
 - Manga theme — red and black color scheme, Bangers font, halftone background, 漫画 logo
+- Responsive layout — works on desktop and mobile
+- Footer — built-by credit with contact info on every page
 
 ---
 
@@ -83,6 +85,12 @@ Then open `http://localhost:5173` in your browser.
 - Jikan rate limit — the API allows about one request per second. Typing very fast may briefly show no results. Pausing for a moment will fix it.
 - Local only — the saved list lives in the browser. Clearing browser data will erase it.
 - Ongoing manga — some chapter counts show as N/A because the series is still publishing.
+
+---
+
+---
+
+Built by @traliach
 
 ---
 
