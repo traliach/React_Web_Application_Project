@@ -9,7 +9,7 @@ Built as the SBA 320H React Web Application Project at Per Scholas.
 
 ## Live Link
 
-**https://celebrated-sprinkles-1b954a.netlify.app**
+**https://meek-fenglisu-25bc7e.netlify.app**
 
 ---
 
