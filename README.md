@@ -1,93 +1,94 @@
 # 漫画 Manga Hub
 
-A manga discovery and personal tracking app. Search any manga by title or browse by genre, view details, and save titles to your personal list with reading status tracking.
+A manga discovery and personal tracking app built with React.
+Search any manga by title or genre, view details, and save titles to your personal reading list.
 
-## Live Link
-
-_Add your Netlify URL here after deploying_
+> Built as the SBA 320H React Web Application Project at Per Scholas.
 
 ---
 
-## Technologies Used
+## 🔗 Live Link
 
-| Technology | Purpose |
+_Paste your Netlify URL here after deploying_
+
+---
+
+## 🛠️ Technologies Used
+
+| Technology | What it does in this project |
 |---|---|
-| React 19 + TypeScript | UI components and type safety |
-| Vite | Build tool and dev server |
-| Tailwind CSS | Styling and responsive layout |
-| Redux Toolkit | Global state management |
-| React Redux | Connect Redux to React components |
-| React Router v7 | Client-side page routing |
-| Jikan API (unofficial MAL) | Free manga data (no API key needed) |
-| localStorage | Persist saved list across page refreshes |
-| Google Fonts (Bangers) | Manga-style typography |
+| **React 19** | Builds the UI using components |
+| **TypeScript** | Adds types so we catch errors early |
+| **Vite** | Runs the dev server and builds the app |
+| **Tailwind CSS** | Styles every element using class names |
+| **Redux Toolkit** | Stores the saved manga list globally |
+| **React Redux** | Connects Redux state to React components |
+| **React Router v7** | Switches between pages without reloading |
+| **Jikan API** | Free manga data — no API key needed |
+| **localStorage** | Saves your list even after you refresh |
+| **Google Fonts (Bangers)** | Gives the app a manga-style font |
 
 ---
 
-## Features
+## ✨ Features
 
-- **Live search** — results appear as you type (debounced 500ms)
+- **Live search** — results appear automatically as you type
 - **Genre filter chips** — browse by Action, Romance, Horror, Fantasy and more
-- **Details slide-over panel** — cover, genres, score, author, synopsis
-- **My List** — save manga with status: Plan to Read → Reading → Completed
-- **Pagination** — Prev / Next through all results
-- **Persistent list** — saved to localStorage, survives page refresh
-- **Loading skeletons** — animated placeholders while fetching
-- **Error banner** — user-friendly error message with Retry button
-- **Manga theme** — halftone background, Bangers font, red/black color scheme
+- **Details panel** — click any card to see cover, genres, score, author, synopsis
+- **My List** — save manga and track reading status
+- **Status cycling** — click the chip to rotate: `Plan to Read → Reading → Completed`
+- **Pagination** — browse through pages of results with Prev / Next
+- **Persistent list** — your list is saved to the browser and survives a refresh
+- **Loading skeletons** — animated cards appear while data loads
+- **Error banner** — friendly message with a Retry button if something goes wrong
+- **Manga theme** — red/black color scheme, Bangers font, halftone background, 漫画 logo
 
 ---
 
-## Approach
+## 📖 How to Use
 
-Built as a single-page application with three views:
-
-1. **Search / Home (`/`)** — live search bar + genre chips, responsive card grid, pagination
-2. **Details Panel** — slide-over triggered by card click, shows full manga info
-3. **My List (`/my-list`)** — grid of saved titles, click status chip to cycle it, remove button
-
-State is split into:
-- `listSlice` — saved manga items, add/remove, status cycle
-- Local component state — search query, results, loading, pagination
+1. **Search** — type a manga name in the search box (results appear as you type)
+2. **Browse by genre** — click any chip like ⚔️ Action or 💕 Romance
+3. **View details** — click any manga card
+4. **Save it** — click **+ Add to My List** inside the panel
+5. **Track it** — go to **My List**, click the status chip to update your progress
+6. **Remove it** — click the **Remove** button on any saved card
 
 ---
 
-## Usage Instructions
+## 🚀 Run This Project Locally
 
-1. Type any manga title in the search box — results load automatically
-2. Or click a **genre chip** (Action, Romance, etc.) to browse by theme
-3. Click any manga card to open the details panel
-4. Click **+ Add to My List** to save it
-5. Navigate to **My List** to see saved titles
-6. Click the colored status chip to cycle: `Plan to Read → Reading → Completed`
-7. Click **Remove** to delete from your list
-
----
-
-## Setup (Run Locally)
+> Make sure you have **Node.js** installed first.
 
 ```bash
+# 1. Clone the repo
 git clone https://github.com/YOUR_USERNAME/React_Web_Application_Project.git
+
+# 2. Go into the project folder
 cd React_Web_Application_Project
+
+# 3. Install all packages
 npm install
+
+# 4. Start the development server
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser.
+Then open `http://localhost:5173` in your browser.
 
 ---
 
-## Unsolved Problems / Known Issues
+## ⚠️ Known Issues
 
-- Jikan API has a rate limit (~1 req/sec). Typing very fast may briefly return empty results.
-- List data is stored locally per browser — no user accounts or cloud sync.
-- `chapters` field is sometimes `null` for ongoing manga (displayed as N/A).
+- **Jikan rate limit** — the API allows ~1 request per second. Typing very fast may briefly show no results. Just pause for a moment and they'll appear.
+- **Local only** — your saved list lives in your browser. Clearing browser data will erase it.
+- **Ongoing manga** — some chapter counts show as N/A because the manga is still publishing.
 
 ---
 
-## Future Improvements
+## 🔮 What I Would Add Next
 
-- Add a search within My List
-- Add sort options (by score, alphabetical)
-- Add volume/chapter progress tracking
-- Deploy with persistent backend (database + user auth)
+- Search within My List
+- Sort results by score or title
+- Track progress per volume/chapter
+- User accounts with cloud-saved lists
