@@ -50,7 +50,6 @@ For a full step-by-step breakdown of every decision, installation, and code chan
 - Manga theme — red and black color scheme, Bangers font, halftone background, 漫画 logo
 - Trending — browse the current top-ranked manga with one click
 - Favorites — heart button on saved manga in My List
-- Score filter — filter any results by minimum score (6+, 7+, 8+, 9+)
 - Responsive layout — works on desktop and mobile
 - Footer — built-by credit with contact info on every page
 
@@ -61,8 +60,7 @@ For a full step-by-step breakdown of every decision, installation, and code chan
 1. Type a manga name in the search box. Results appear as you type.
 2. Or click a genre chip like Action or Romance to browse by theme.
 3. Or click Trending to see the current top-ranked manga.
-4. Use the Min Score dropdown to filter results by rating.
-5. Click any manga card to open the details panel.
+4. Click any manga card to open the details panel.
 6. Click Add to My List to save it.
 7. Go to My List, click the heart to mark a favorite, and click the status chip to update progress.
 8. Click Remove to delete a title from the list.
@@ -111,4 +109,4 @@ Built by @traliach
 - Sort saved list by score or title
 - Track reading progress per volume or chapter
 - User accounts with a cloud-saved list
-- Trending page with real-time data
+- Server-side score filtering using Jikan's `min_score` query parameter so results are accurate across all pages

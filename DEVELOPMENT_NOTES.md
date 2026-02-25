@@ -565,6 +565,29 @@ File changed: `src/App.tsx` — added `flex flex-col` to the outer div so the fo
 
 ---
 
+## Step 18 — Score Filter (Attempted and Removed)
+
+A "Filter by rating" dropdown was added to let users filter results by minimum score (Good 6+, Great 7+, Excellent 8+, Top Rated 9+).
+
+The implementation used a client-side filter applied to the current page of results before rendering:
+```tsx
+results
+  .filter(manga => minScore === 0 || (manga.score ?? 0) >= minScore)
+  .map(manga => ( ... ))
+```
+
+The problem was that this only filtered the 20 results currently loaded on the page. The pagination counter still showed the full unfiltered total from Jikan (e.g. "Page 1 of 4114"), which was misleading. Selecting "Top Rated (9+)" would show only 3 cards but the pagination still implied thousands of pages.
+
+Attempts to fix it:
+- First tried resetting the page count when a filter was applied — but Jikan does not return a filtered page count.
+- Then tried hiding pagination while the filter was active and showing a note ("Showing filtered results from this page only") — but this made the feature feel incomplete and confusing.
+
+The root cause is that accurate score filtering requires a server-side request with Jikan's `min_score` parameter so the API handles the filtering and returns the correct pagination. Client-side filtering of paginated data is not reliable.
+
+The feature was removed. A proper server-side implementation is listed in the README as a future improvement.
+
+---
+
 ## All Packages Installed
 
 ```bash
