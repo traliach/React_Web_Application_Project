@@ -2,15 +2,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addToList, removeFromList } from '../store/listSlice'
 import type { RootState } from '../store/store'
 
+// Props this component expects
 interface Props {
   manga: any
   onClose: () => void
 }
 
+// Slide-over panel for manga details
 export default function DetailsPanel({ manga, onClose }: Props) {
   const dispatch = useDispatch()
+  // Check if manga is already saved
   const saved = useSelector((s: RootState) => s.list.items.find(m => m.id === manga.mal_id))
 
+  // Add or remove from list
   function handleToggle() {
     if (saved) {
       dispatch(removeFromList(manga.mal_id))
@@ -22,10 +26,14 @@ export default function DetailsPanel({ manga, onClose }: Props) {
       }))
     }
   }
+
   return (
+    // Dark overlay behind panel
     <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Click overlay to close */}
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <aside className="relative w-full max-w-md bg-gray-900 h-full overflow-y-auto shadow-xl p-6 flex flex-col gap-4">
+        {/* Close button top right */}
         <button
           onClick={onClose}
           aria-label="Close panel"
@@ -33,12 +41,14 @@ export default function DetailsPanel({ manga, onClose }: Props) {
         >
           ✕
         </button>
+        {/* Manga cover image */}
         <img
           src={manga.images.jpg.large_image_url}
           alt={manga.title}
           className="w-40 rounded-lg mx-auto"
         />
         <h2 className="text-xl font-bold text-white text-center">{manga.title}</h2>
+        {/* Genre tags row */}
         <div className="flex flex-wrap gap-2 justify-center">
           {manga.genres?.map((g: any) => (
             <span key={g.mal_id} className="bg-indigo-700 text-white text-xs px-2 py-1 rounded-full">
@@ -46,6 +56,7 @@ export default function DetailsPanel({ manga, onClose }: Props) {
             </span>
           ))}
         </div>
+        {/* Key info fields */}
         <div className="text-gray-400 text-sm space-y-1">
           <p><span className="text-gray-200 font-medium">Status:</span> {manga.status}</p>
           <p><span className="text-gray-200 font-medium">Chapters:</span> {manga.chapters ?? 'N/A'}</p>
@@ -54,12 +65,14 @@ export default function DetailsPanel({ manga, onClose }: Props) {
             <p><span className="text-gray-200 font-medium">Author:</span> {manga.authors[0].name}</p>
           )}
         </div>
+        {/* Save or remove button */}
         <button
           onClick={handleToggle}
           className={`w-full py-2 rounded-lg font-semibold text-white ${saved ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'}`}
         >
           {saved ? 'Remove from List' : '+ Add to My List'}
         </button>
+        {/* Short synopsis text */}
         <p className="text-gray-300 text-sm leading-relaxed line-clamp-6">{manga.synopsis}</p>
       </aside>
     </div>

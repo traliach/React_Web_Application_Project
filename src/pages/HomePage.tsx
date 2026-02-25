@@ -2,17 +2,28 @@ import { useState, useEffect, useRef } from 'react'
 import { searchManga, getMangaById } from '../services/jikan'
 import DetailsPanel from '../components/DetailsPanel'
 
+// Main search and results page
 export default function HomePage() {
+  // Controlled input value
   const [query, setQuery] = useState('')
+  // Array of manga results
   const [results, setResults] = useState<any[]>([])
+  // True while fetching data
   const [loading, setLoading] = useState(false)
+  // Error message string
   const [error, setError] = useState('')
+  // Current page number
   const [page, setPage] = useState(1)
+  // Total pages available
   const [lastPage, setLastPage] = useState(1)
+  // Manga shown in panel
   const [selected, setSelected] = useState<any>(null)
+  // True after first search
   const [hasSearched, setHasSearched] = useState(false)
+  // Holds the debounce timer
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Auto-search 500ms after typing
   useEffect(() => {
     if (!query.trim()) return
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -23,17 +34,14 @@ export default function HomePage() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [query])
 
-  async function handleCardClick(id: number) {
-    const data = await getMangaById(id)
-    setSelected(data.data)
-  }
-
+  // Fetch one page of results
   async function fetchPage(q: string, p: number) {
     setLoading(true)
     setError('')
     setResults([])
     try {
       const data = await searchManga(q, p)
+      // Fallback to empty array
       setResults(data.data ?? [])
       setLastPage(data.pagination.last_visible_page)
       setHasSearched(true)
@@ -44,6 +52,7 @@ export default function HomePage() {
     }
   }
 
+  // Handle form submit (Enter or button)
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     if (!query.trim()) return
@@ -51,21 +60,30 @@ export default function HomePage() {
     fetchPage(query.trim(), 1)
   }
 
+  // Go to previous page
   function handlePrev() {
     const p = page - 1
     setPage(p)
     fetchPage(query, p)
   }
 
+  // Go to next page
   function handleNext() {
     const p = page + 1
     setPage(p)
     fetchPage(query, p)
   }
 
+  // Fetch full details for panel
+  async function handleCardClick(id: number) {
+    const data = await getMangaById(id)
+    setSelected(data.data)
+  }
+
   return (
     <>
     <main className="max-w-5xl mx-auto p-6">
+      {/* Search input and button */}
       <form onSubmit={handleSearch} className="flex gap-2 mb-8">
         <input
           type="text"
@@ -83,6 +101,7 @@ export default function HomePage() {
         </button>
       </form>
 
+      {/* Error message with retry */}
       {error && (
         <div className="bg-red-900/40 border border-red-500 text-red-300 px-4 py-3 rounded-lg mb-4 flex justify-between items-center">
           <span>{error}</span>
@@ -90,6 +109,7 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Skeleton cards while loading */}
       {loading && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -101,8 +121,10 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Results grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {!loading && results.map(manga => (
+          // Click card to open panel
           <div key={manga.mal_id} onClick={() => handleCardClick(manga.mal_id)} className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-indigo-500 transition-all">
             <img
               src={manga.images.jpg.image_url}
@@ -116,10 +138,12 @@ export default function HomePage() {
         ))}
       </div>
 
+      {/* Show when search returns nothing */}
       {!loading && hasSearched && results.length === 0 && (
         <p className="text-center text-gray-500 mt-20">No results for "{query}".</p>
       )}
 
+      {/* Prev / Next pagination */}
       {results.length > 0 && (
         <div className="flex items-center justify-center gap-4 mt-8">
           <button
@@ -141,6 +165,7 @@ export default function HomePage() {
       )}
     </main>
 
+    {/* Details panel overlay */}
     {selected && <DetailsPanel manga={selected} onClose={() => setSelected(null)} />}
     </>
   )
