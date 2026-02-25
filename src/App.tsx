@@ -9,15 +9,17 @@ function App() {
   return (
     <BrowserRouter>
       {/* Full app background */}
-      <div className="min-h-screen halftone text-white">
+      <div className="min-h-screen halftone text-white flex flex-col">
         {/* Top navigation bar */}
         <HeaderNav />
-        <Routes>
-          {/* Search home page */}
-          <Route path="/" element={<HomePage />} />
-          {/* Saved list page */}
-          <Route path="/my-list" element={<MyListPage />} />
-        </Routes>
+        <div className="flex-1">
+          <Routes>
+            {/* Search home page */}
+            <Route path="/" element={<HomePage />} />
+            {/* Saved list page */}
+            <Route path="/my-list" element={<MyListPage />} />
+          </Routes>
+        </div>
         <Footer />
       </div>
     </BrowserRouter>
