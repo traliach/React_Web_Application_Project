@@ -7,6 +7,12 @@ Built as the SBA 320H React Web Application Project at Per Scholas.
 
 ---
 
+## Development Notes
+
+For a full step-by-step breakdown of every decision, installation, and code change made during this project, see [DEVELOPMENT_NOTES.md](./DEVELOPMENT_NOTES.md).
+
+---
+
 ## Live Link
 
 **https://meek-fenglisu-25bc7e.netlify.app**
