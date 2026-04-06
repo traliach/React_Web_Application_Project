@@ -61,22 +61,15 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Tell EC2 to pull the new image and restart the manga-hub container
+                // Jenkins runs on the same EC2 instance — deploy directly via docker compose
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr-credentials',
                     usernameVariable: 'GHCR_USER',
                     passwordVariable: 'GHCR_PASS'
                 )]) {
                     sh """
-                        aws ssm send-command \
-                          --instance-ids i-0eb277f732ee785ac \
-                          --document-name AWS-RunShellScript \
-                          --region us-east-1 \
-                          --parameters 'commands=[
-                            "echo ${GHCR_PASS} | docker login ghcr.io -u ${GHCR_USER} --password-stdin",
-                            "cd /opt/platform && APP_VERSION=${IMAGE_TAG} docker compose pull manga-hub",
-                            "cd /opt/platform && APP_VERSION=${IMAGE_TAG} docker compose up -d manga-hub --remove-orphans"
-                          ]'
+                        echo "\${GHCR_PASS}" | docker login ghcr.io -u "\${GHCR_USER}" --password-stdin
+                        APP_VERSION=${IMAGE_TAG} docker compose -f /opt/platform/docker-compose.yml up -d manga-hub --remove-orphans
                     """
                 }
             }
