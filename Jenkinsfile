@@ -69,10 +69,7 @@ pipeline {
                 )]) {
                     sh """
                         echo "\${GHCR_PASS}" | docker login ghcr.io -u "\${GHCR_USER}" --password-stdin
-                        APP_VERSION=${IMAGE_TAG} docker compose \
-                          --project-directory /opt/platform \
-                          -f /opt/platform/docker-compose.yml \
-                          up -d --remove-orphans manga-hub
+                        APP_VERSION=${IMAGE_TAG} docker-compose -f /opt/platform/docker-compose.yml up -d --remove-orphans manga-hub
                     """
                 }
             }
